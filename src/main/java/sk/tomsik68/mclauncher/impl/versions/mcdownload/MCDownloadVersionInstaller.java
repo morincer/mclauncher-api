@@ -1,6 +1,7 @@
 package sk.tomsik68.mclauncher.impl.versions.mcdownload;
 
 import net.minidev.json.JSONStyle;
+import org.slf4j.Logger;
 import sk.tomsik68.mclauncher.api.common.MCLauncherAPI;
 import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
 import sk.tomsik68.mclauncher.api.ui.IProgressMonitor;
@@ -15,7 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 final class MCDownloadVersionInstaller implements IVersionInstaller {
     private final ArrayList<IVersionInstallListener> listeners = new ArrayList<IVersionInstallListener>();
@@ -39,7 +40,7 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
         MCDJarManager jarManager = new MCDJarManager(mc);
         LibraryProvider libraryProvider = new LibraryProvider(mc);
         Logger log = MCLauncherAPI.log;
-        log.fine("Checking compatibility...");
+        log.debug("Checking compatibility...");
         MCDownloadVersion version = (MCDownloadVersion) v;
         // check compatibility of this version
         if (!version.isCompatible())
@@ -51,12 +52,12 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
 
         // if we're inheriting from a version
         if(version.getInheritsFrom() != null && version.getInheritsFrom().length() > 0){
-            MCLauncherAPI.log.fine("Looks like we're inheriting a version. Checking parent version...");
+            MCLauncherAPI.log.debug("Looks like we're inheriting a version. Checking parent version...");
             // download the parent version information
             IVersion parent = versionList.retrieveVersionInfo(version.getInheritsFrom());
             // and the parent version isn't installed
             File jsonFile = jarManager.getInfoFile(parent);
-            MCLauncherAPI.log.fine("Looking for ".concat(jsonFile.getAbsolutePath()));
+            MCLauncherAPI.log.debug("Looking for ".concat(jsonFile.getAbsolutePath()));
             if (!jsonFile.exists()) {
                 MCLauncherAPI.log.info("Installing parent version...");
                 parent.getInstaller().install(parent, mc, progress);
@@ -64,26 +65,26 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
         }
 
 
-        log.fine("Version compatible");
+        log.debug("Version compatible");
         List<Library> toInstall = version.getLibraries();
         List<Library> toExtract = new ArrayList<Library>();
-        log.fine("Fetching libraries...");
+        log.debug("Fetching libraries...");
         if(haveProgress)
             progress.setStatus("Fetching Libraries...");
         
-        log.fine("Platform: " + Platform.getCurrentPlatform().getDisplayName());
+        log.debug("Platform: " + Platform.getCurrentPlatform().getDisplayName());
         // install all libraries that are needed
         for (Library lib : toInstall) {
             if (lib.isCompatible()) {
                 if (!libraryProvider.isInstalled(lib)) {
-                    log.finest("Installing " + lib.getName());
+                    log.trace("Installing " + lib.getName());
                     if(haveProgress)
                         progress.setStatus("Installing " + lib.getName());
                     try {
                         downloadLibrary(lib.getDownloadURL(), libraryProvider.getLibraryFile(lib), progress);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        log.finest("Failed to install " + lib.getName());
+                        log.trace("Failed to install " + lib.getName());
                     }
                 }
                 // if library has natives, it needs to be extracted...
@@ -91,11 +92,11 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
                     toExtract.add(lib);
                 }
             } else {
-                log.finest(lib.getName() + " is not compatible.");
+                log.trace(lib.getName() + " is not compatible.");
             }
         }
 
-        log.fine("Extracting natives...");
+        log.debug("Extracting natives...");
         if(haveProgress)
             progress.setStatus("Extracting natives...");
         
@@ -107,7 +108,7 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
                 f.delete();
             }
         }
-        log.fine("Extracting libraries...");
+        log.debug("Extracting libraries...");
         if(haveProgress)
             progress.setStatus("Extracting Libraries...");
         
@@ -117,17 +118,17 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
             ExtractUtils.extractZipWithRules(libFile, nativesDir, lib.getExtractRules());
         }
 
-        log.fine("Updating resources...");
+        log.debug("Updating resources...");
         if(haveProgress)
             progress.setStatus("Updating Resource...");
         updateResources(mc, version, progress);
         File jarDest = jarManager.getVersionJAR(version);
         File jsonDest = jarManager.getInfoFile(version);
-        log.fine("Writing version info JSON file...");
+        log.debug("Writing version info JSON file...");
         // always overwrite json file
         FileUtils.writeFile(jsonDest, version.toJSON().toJSONString(JSONStyle.LT_COMPRESS));
         // and jar file
-        log.fine("Downloading game JAR...");
+        log.debug("Downloading game JAR...");
         // if this version uses its own jar
         if(version.getJarVersion().equals(version.getId())) {
             // download it

@@ -21,7 +21,7 @@ public class TestMCDownloadForgeLaunch {
 
     @Test
     public void test() {
-        MCLauncherAPI.log.setLevel(Level.ALL);
+//        MCLauncherAPI.log.setLevel(Level.ALL);
         try {
             // finally use my minecraft credentials
             System.out.println("Logging in...");

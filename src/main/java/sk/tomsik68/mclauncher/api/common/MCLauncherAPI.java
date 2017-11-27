@@ -1,8 +1,10 @@
 package sk.tomsik68.mclauncher.api.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sk.tomsik68.mclauncher.impl.common.Platform;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 /**
  * This is main control class of MCLauncherAPI.
@@ -12,7 +14,7 @@ import java.util.logging.Logger;
  */
 public class MCLauncherAPI {
     public static final int MC_LAUNCHER_VERSION = 15;
-    public static Logger log = Logger.getLogger(MCLauncherAPI.class.getName());
+    public static Logger log = LoggerFactory.getLogger(MCLauncherAPI.class.getName());
 
     static {
         Platform.getCurrentPlatform();

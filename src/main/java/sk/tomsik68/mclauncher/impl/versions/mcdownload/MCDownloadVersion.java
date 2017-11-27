@@ -166,7 +166,7 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
     }
 
     void doInherit(MCDownloadVersion parent) {
-        MCLauncherAPI.log.finer("Inheriting version ".concat(id).concat(" from ").concat(parent.getId()));
+        MCLauncherAPI.log.debug("Inheriting version ".concat(id).concat(" from ").concat(parent.getId()));
         if(!parent.getId().equals(getInheritsFrom())){
             throw new IllegalArgumentException("Wrong inheritance version passed!");
         }
@@ -195,6 +195,6 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
             rules.addAll(parent.rules);
 
         needsInheritance = false;
-        MCLauncherAPI.log.finer("Inheriting version ".concat(id).concat(" finished."));
+        MCLauncherAPI.log.debug("Inheriting version ".concat(id).concat(" finished."));
     }
 }

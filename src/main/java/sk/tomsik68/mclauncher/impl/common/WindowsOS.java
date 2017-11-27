@@ -33,7 +33,7 @@ final class WindowsOS implements IOperatingSystem {
         } else {
             workDir = new File(System.getProperty("user.home"), ".minecraft");
         }
-        MCLauncherAPI.log.fine("Minecraft working directory: ".concat(workDir.getAbsolutePath()));
+        MCLauncherAPI.log.debug("Minecraft working directory: ".concat(workDir.getAbsolutePath()));
         return workDir;
     }
 

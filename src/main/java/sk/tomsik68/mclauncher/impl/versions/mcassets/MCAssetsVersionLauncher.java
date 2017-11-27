@@ -91,7 +91,7 @@ public final class MCAssetsVersionLauncher implements IVersionLauncher {
         command.add(jarManager.getNativesDirectory().getAbsolutePath());
         // warn dev if they want to use mods on this
         if(mods != null){
-            MCLauncherAPI.log.warning("You're trying to use mods with MCAssets version. MCAssets versions are deprecated, so mods won't load correctly.");
+            MCLauncherAPI.log.warn("You're trying to use mods with MCAssets version. MCAssets versions are deprecated, so mods won't load correctly.");
         }
         return command;
     }

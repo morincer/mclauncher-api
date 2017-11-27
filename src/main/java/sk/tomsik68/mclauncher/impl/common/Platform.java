@@ -51,7 +51,7 @@ public final class Platform {
      * @param p - The operating system we want to use
      * */
     public static void forcePlatform(IOperatingSystem p) {
-        MCLauncherAPI.log.fine("Current platform: ".concat(p.getDisplayName()));
+        MCLauncherAPI.log.debug("Current platform: ".concat(p.getDisplayName()));
         currentOS = p;
     }
 

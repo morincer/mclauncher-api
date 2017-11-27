@@ -30,7 +30,7 @@ final class UnknownOS implements IOperatingSystem {
             return workDir;
         String userHome = System.getProperty("user.home");
         workDir = new File(userHome, ".minecraft");
-        MCLauncherAPI.log.fine("Minecraft working directory: ".concat(workDir.getAbsolutePath()));
+        MCLauncherAPI.log.trace("Minecraft working directory: ".concat(workDir.getAbsolutePath()));
         return workDir;
     }
 

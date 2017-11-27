@@ -28,10 +28,10 @@ public final class LegacyLoginService implements ILoginService {
 
     @Override
     public ISession login(IProfile profile) throws Exception {
-        MCLauncherAPI.log.fine("Logging in with legacy service...");
+        MCLauncherAPI.log.debug("Logging in with legacy service...");
         String loginResponse = HttpUtils.securePostWithKey(LOGIN_URL, LegacyLoginService.class.getResourceAsStream("minecraft.key"), "user="
                 + encode(profile.getName()) + "&password=" + encode(profile.getPassword()) + "&version=13");
-        MCLauncherAPI.log.fine("Got response! Parsing response...");
+        MCLauncherAPI.log.debug("Got response! Parsing response...");
         ISession result = factory.createSession(loginResponse.split(":"));
         return result;
     }
@@ -39,7 +39,7 @@ public final class LegacyLoginService implements ILoginService {
     @Override
     public void logout(ISession session) throws Exception {
         // nothing happens, can't log out.
-        MCLauncherAPI.log.fine("LegacyLoginService doesn't provide logout feature.");
+        MCLauncherAPI.log.debug("LegacyLoginService doesn't provide logout feature.");
     }
 
 }

@@ -28,7 +28,7 @@ final class MCDownloadLocalVersionList extends Observable<String> implements IVe
     @Override
     public void startDownload() throws Exception {
         if(!versionsFolder.exists() || versionsFolder.isFile()){
-            MCLauncherAPI.log.fine("'versions' folder at '".concat(versionsFolder.getAbsolutePath()).concat("' doesn't exist or is invalid."));
+            MCLauncherAPI.log.debug("'versions' folder at '".concat(versionsFolder.getAbsolutePath()).concat("' doesn't exist or is invalid."));
             return;
         }
         File[] versionFolders = versionsFolder.listFiles(new FileFilter() {
@@ -50,7 +50,7 @@ final class MCDownloadLocalVersionList extends Observable<String> implements IVe
     public IVersion retrieveVersionInfo(String id) throws Exception {
         File versionFolder = getVersionFolder(id);
         if(!versionFolder.exists()){
-            MCLauncherAPI.log.fine("version folder at '".concat(versionFolder.getAbsolutePath()).concat("' doesn't exist or is invalid."));
+            MCLauncherAPI.log.debug("version folder at '".concat(versionFolder.getAbsolutePath()).concat("' doesn't exist or is invalid."));
             return null;
         }
         File jsonFile = new File(versionFolder, versionFolder.getName().concat(".json"));

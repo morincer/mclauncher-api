@@ -13,10 +13,10 @@ final class LegacySessionFactory {
         if (params == null)
             throw new LoginException("Unable to login!");
         else if(params.length != 5) {
-            MCLauncherAPI.log.fine("Parameter count is not 5.");
+            MCLauncherAPI.log.debug("Parameter count is not 5.");
             throw new LoginException("Invalid parameters array length!");
         }
-        MCLauncherAPI.log.fine("Everything looks fine. Login successful.");
+        MCLauncherAPI.log.debug("Everything looks fine. Login successful.");
         return new LegacySession(params[2], params[3], params[4], params[1], params[0]);
     }
 

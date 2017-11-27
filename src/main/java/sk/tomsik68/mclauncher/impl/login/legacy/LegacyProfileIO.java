@@ -30,13 +30,13 @@ public final class LegacyProfileIO implements IProfileIO {
     public void write(IProfile[] profile) throws Exception {
         // warn the developer if they want to save more profiles
         if(profile.length > 1){
-            MCLauncherAPI.log.warning("Saving multiple profiles using LegacyProfileIO is not possible! MCLauncherAPI will only save the one that is 0th in the array. Other profiles won't be saved!");
+            MCLauncherAPI.log.warn("Saving multiple profiles using LegacyProfileIO is not possible! MCLauncherAPI will only save the one that is 0th in the array. Other profiles won't be saved!");
         }
         // create the file if it doesn't exist
         if (!dest.exists()) {
-            MCLauncherAPI.log.fine("lastlogin file doesn't exist. Creating it...");
+            MCLauncherAPI.log.debug("lastlogin file doesn't exist. Creating it...");
             FileUtils.createFileSafely(dest);
-            MCLauncherAPI.log.fine("lastlogin file created.");
+            MCLauncherAPI.log.debug("lastlogin file created.");
         }
         // write the profile as 2 UTF strings encrypted with LegacyLoginEncryptionProcessor
         DataOutputStream out = new DataOutputStream(proc.encrypt(new FileOutputStream(dest)));

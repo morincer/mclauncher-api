@@ -30,7 +30,7 @@ final class SolarisOS implements IOperatingSystem {
             return workDir;
         String userHome = System.getProperty("user.home");
         workDir = new File(userHome, ".minecraft");
-        MCLauncherAPI.log.fine("Minecraft working directory: ".concat(workDir.getAbsolutePath()));
+        MCLauncherAPI.log.debug("Minecraft working directory: ".concat(workDir.getAbsolutePath()));
         return workDir;
     }
 
