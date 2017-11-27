@@ -12,7 +12,7 @@ import sk.tomsik68.mclauncher.impl.versions.mcdownload.Rule.Action;
 import java.util.ArrayList;
 import java.util.List;
 
-final class MCDownloadVersion implements IVersion, IJSONSerializable {
+final class MCDownloadVersion implements IVersion, IJSONSerializable, sk.tomsik68.mclauncher.api.versions.IVersionShort {
     private static final MCDownloadVersionInstaller installer = new MCDownloadVersionInstaller();
     private static final IVersionLauncher launcher = new MCDownloadVersionLauncher();
     private static final String DEFAULT_ASSETS_INDEX = "legacy";
@@ -100,15 +100,18 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
         return type.charAt(0) + getId();
     }
 
-    String getTime() {
+    @Override
+    public String getTime() {
         return time;
     }
 
-    String getReleaseTime() {
+    @Override
+    public String getReleaseTime() {
         return releaseTime;
     }
 
-    String getType() {
+    @Override
+    public String getType() {
         return type;
     }
 
@@ -177,6 +180,7 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
         return jarVersion;
     }
 
+    @Override
     public String getUrl() {
         return url;
     }

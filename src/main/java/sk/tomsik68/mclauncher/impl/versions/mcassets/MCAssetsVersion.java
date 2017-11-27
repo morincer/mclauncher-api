@@ -33,6 +33,26 @@ final class MCAssetsVersion implements IVersion {
     }
 
     @Override
+    public String getTime() {
+        return null;
+    }
+
+    @Override
+    public String getReleaseTime() {
+        return null;
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
+
+    @Override
+    public String getUrl() {
+        return null;
+    }
+
+    @Override
     public String getUniqueID() {
         return getId();
     }

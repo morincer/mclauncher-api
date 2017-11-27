@@ -3,10 +3,8 @@ package sk.tomsik68.mclauncher.impl.versions.mcdownload;
 import org.junit.Before;
 import org.junit.Test;
 import sk.tomsik68.mclauncher.api.versions.IVersion;
+import sk.tomsik68.mclauncher.api.versions.IVersionShort;
 import sk.tomsik68.mclauncher.api.versions.LatestVersionInformation;
-import sk.tomsik68.mclauncher.util.FileUtils;
-
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -50,7 +48,7 @@ public class MCDownloadCachedVersionListTest {
     }
 
     @Test
-    public void getVersionInfoShouldReturnNonEmptyInformation() throws Exception {
+    public void getVersionInfoShouldReturnNonEmptyBasicInformation() throws Exception {
         IVersion version = downloadCachedVersionList.retrieveVersionInfo("1.7.10");
         assertThat(version, notNullValue());
         assertThat(version.getId(), equalTo("1.7.10"));
@@ -58,11 +56,10 @@ public class MCDownloadCachedVersionListTest {
 
     @Test
     public void getVersionsListShouldReturnListOfVersionsWithBasicInfo() throws Exception {
-        List<MCDownloadVersion> versionsListShortInfo = downloadCachedVersionList.getVersionsListShortInfo();
+        List<IVersionShort> versionsListShortInfo = downloadCachedVersionList.getShortInfoVersionList();
 
         assertThat(versionsListShortInfo.size(), is(greaterThan(0)));
-        MCDownloadVersion mcDownloadVersion = versionsListShortInfo.get(0);
+        IVersionShort mcDownloadVersion = versionsListShortInfo.get(0);
         assertThat(mcDownloadVersion.getId(), notNullValue());
-        assertThat(mcDownloadVersion.getMainClass(), nullValue());
     }
 }

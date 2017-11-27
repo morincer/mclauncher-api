@@ -1,15 +1,12 @@
 package sk.tomsik68.mclauncher.impl.versions.mcdownload;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.slf4j.Logger;
 import sk.tomsik68.mclauncher.api.common.IObserver;
 import sk.tomsik68.mclauncher.api.common.MCLauncherAPI;
-import sk.tomsik68.mclauncher.api.versions.IVersion;
-import sk.tomsik68.mclauncher.api.versions.IVersionList;
-import sk.tomsik68.mclauncher.api.versions.LatestVersionInformation;
+import sk.tomsik68.mclauncher.api.versions.*;
 import sk.tomsik68.mclauncher.util.HttpUtils;
 
 import java.io.IOException;
@@ -17,9 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class MCDownloadCachedVersionList implements IVersionList {
+public class MCDownloadCachedVersionList implements ICachedVersionList, IShortInfoVersionList {
 
     public static final String VERSIONS_LIST_FILENAME = "versions.json";
     public static final String VERSION_MANIFEST_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
@@ -30,12 +26,17 @@ public class MCDownloadCachedVersionList implements IVersionList {
 
     private Path versionsListFile;
 
-    private Dictionary<String, MCDownloadVersion> versionsCache;
+    private Dictionary<String, IVersionShort> versionsCache;
 
     public MCDownloadCachedVersionList(String cacheLocationDir) {
         this(cacheLocationDir, VERSION_MANIFEST_URL);
     }
 
+    /**
+     * Creates a new instance allowing to specify both the cache directory and manifest URL
+     * @param cacheLocationDir - the directory to store the cached JSON
+     * @param versionManifestUrl - the URL of the version_manifest.json
+     */
     public MCDownloadCachedVersionList(String cacheLocationDir, String versionManifestUrl) {
         this.versionsListFile = Paths.get(cacheLocationDir, VERSIONS_LIST_FILENAME).toAbsolutePath();
         this.manifestUrl = versionManifestUrl;
@@ -62,6 +63,15 @@ public class MCDownloadCachedVersionList implements IVersionList {
         }
     }
 
+    @Override
+    public void setCacheDirectory(Path cacheDirectory) {
+        this.versionsListFile = Paths.get(cacheDirectory.toAbsolutePath().toString(), VERSIONS_LIST_FILENAME);
+    }
+
+    /**
+     * Invalidates the caches making subsequent calls for data go for the online data sources
+     * @throws IOException
+     */
     public void invalidateCache() throws IOException {
         Files.deleteIfExists(this.versionsListFile);
         versionsCache = null;
@@ -71,8 +81,8 @@ public class MCDownloadCachedVersionList implements IVersionList {
     public IVersion retrieveVersionInfo(String id) throws Exception {
         ensureVersionsCache();
 
-        MCDownloadVersion mcDownloadVersion = versionsCache.get(id);
-        if (mcDownloadVersion == null || mcDownloadVersion.getUrl() == null) throw new InvalidArgumentException(new String[]{"Failed to find URL for the version " + id});
+        IVersionShort mcDownloadVersion = versionsCache.get(id);
+        if (mcDownloadVersion == null || mcDownloadVersion.getUrl() == null) throw new Exception("Failed to find URL for the version " + id);
 
         String fullVersionJSONString = HttpUtils.httpGet(mcDownloadVersion.getUrl());
         JSONObject fullVersionObject = (JSONObject) JSONValue.parse(fullVersionJSONString);
@@ -96,14 +106,6 @@ public class MCDownloadCachedVersionList implements IVersionList {
         }
     }
 
-    /**
-     * @return The list of current (cached or remote) versions with basic information: id, type, time, release time, url
-     * as they're retrieved from the manifest file.
-     */
-    public List<MCDownloadVersion> getVersionsListShortInfo() throws Exception {
-        ensureVersionsCache();
-        return Collections.list(this.versionsCache.elements());
-    }
 
     @Override
     public LatestVersionInformation getLatestVersionInformation() throws Exception {
@@ -131,5 +133,11 @@ public class MCDownloadCachedVersionList implements IVersionList {
 
     public Path getVersionsListFile() {
         return versionsListFile;
+    }
+
+    @Override
+    public List<IVersionShort> getShortInfoVersionList() throws Exception {
+        ensureVersionsCache();
+        return Collections.list(this.versionsCache.elements());
     }
 }
