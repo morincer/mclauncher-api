@@ -4,6 +4,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sk.tomsik68.mclauncher.api.common.IObserver;
 import sk.tomsik68.mclauncher.api.common.MCLauncherAPI;
 import sk.tomsik68.mclauncher.api.versions.*;
@@ -22,7 +23,7 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
 
     private final String manifestUrl;
 
-    private static final Logger log = MCLauncherAPI.log;
+    private static final Logger log = LoggerFactory.getLogger(MCDownloadCachedVersionList.class);
 
     private Path versionsListFile;
 
@@ -58,6 +59,7 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
         } else {
             Files.createDirectories(this.versionsListFile.getParent());
             // at first, we download the complete version list
+            log.info("Fetching versions metadata from " + manifestUrl);
             String jsonString = HttpUtils.httpGet(manifestUrl);
             Files.write(this.versionsListFile, jsonString.getBytes());
         }
@@ -83,6 +85,8 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
 
         IVersionShort mcDownloadVersion = versionsCache.get(id);
         if (mcDownloadVersion == null || mcDownloadVersion.getUrl() == null) throw new Exception("Failed to find URL for the version " + id);
+
+        log.info("Fetching version information from " + mcDownloadVersion.getUrl());
 
         String fullVersionJSONString = HttpUtils.httpGet(mcDownloadVersion.getUrl());
         JSONObject fullVersionObject = (JSONObject) JSONValue.parse(fullVersionJSONString);
