@@ -9,6 +9,10 @@ import sk.tomsik68.mclauncher.api.versions.LatestVersionInformation;
 import sk.tomsik68.mclauncher.impl.common.Observable;
 import sk.tomsik68.mclauncher.util.HttpUtils;
 
+@Deprecated
+/**
+ * @deprecated The URLs and logic are outdated. Use MCDownloadCachedVersion instead
+ */
 final class MCDownloadOnlineVersionList extends Observable<String> implements IVersionList{
 
     private static final String JSONVERSION_LIST_URL = "http://s3.amazonaws.com/Minecraft.Download/versions/versions.json";
