@@ -17,7 +17,7 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
     private static final IVersionLauncher launcher = new MCDownloadVersionLauncher();
     private static final String DEFAULT_ASSETS_INDEX = "legacy";
 
-    private String id, time, releaseTime, type, minecraftArgs, mainClass, jarVersion;
+    private String id, time, releaseTime, type, minecraftArgs, mainClass, jarVersion, url;
     private int minimumLauncherVersion;
     private final JSONObject json;
     private String incompatibilityReason, processArgs, assets, inheritsFrom;
@@ -29,6 +29,10 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
     MCDownloadVersion(JSONObject json) {
         this.json = json;
         id = json.get("id").toString();
+        if (json.containsKey("url")) {
+            url = json.get("url").toString();
+        }
+
         if(json.containsKey("jar")) {
             jarVersion = json.get("jar").toString();
         } else {
@@ -39,9 +43,17 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
         type = json.get("type").toString();
         if (json.containsKey("processArguments"))
             processArgs = json.get("processArguments").toString();
-        minecraftArgs = json.get("minecraftArguments").toString();
-        minimumLauncherVersion = Integer.parseInt(json.get("minimumLauncherVersion").toString());
-        mainClass = json.get("mainClass").toString();
+        if (json.containsKey("minecraftArguments")) {
+            minecraftArgs = json.get("minecraftArguments").toString();
+        }
+
+        if (json.containsKey("minimumLauncherVersion")) {
+            minimumLauncherVersion = Integer.parseInt(json.get("minimumLauncherVersion").toString());
+        }
+
+        if (json.containsKey("mainClass")) {
+            mainClass = json.get("mainClass").toString();
+        }
         if (json.containsKey("assets"))
             assets = json.get("assets").toString();
         else
@@ -165,6 +177,10 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
         return jarVersion;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
     void doInherit(MCDownloadVersion parent) {
         MCLauncherAPI.log.debug("Inheriting version ".concat(id).concat(" from ").concat(parent.getId()));
         if(!parent.getId().equals(getInheritsFrom())){
@@ -197,4 +213,6 @@ final class MCDownloadVersion implements IVersion, IJSONSerializable {
         needsInheritance = false;
         MCLauncherAPI.log.debug("Inheriting version ".concat(id).concat(" finished."));
     }
+
+
 }
