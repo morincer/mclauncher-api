@@ -16,6 +16,10 @@ public interface IForgeAsset {
      */
     String getHash();
 
+    String getMinecraftVersion();
+
+    String getForgeVersion();
+
     IForgeDownloader getDownloader();
 
 }

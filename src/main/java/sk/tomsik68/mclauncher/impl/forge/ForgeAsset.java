@@ -5,7 +5,7 @@ import sk.tomsik68.mclauncher.api.forge.IForgeDownloader;
 
 public class ForgeAsset implements IForgeAsset {
 
-    private String packageType, type, hash;
+    private String packageType, type, hash, minecraftVersion, forgeVersion;
     private IForgeDownloader downloader;
 
     @Override
@@ -42,5 +42,23 @@ public class ForgeAsset implements IForgeAsset {
 
     public void setDownloader(IForgeDownloader downloader) {
         this.downloader = downloader;
+    }
+
+    @Override
+    public String getMinecraftVersion() {
+        return minecraftVersion;
+    }
+
+    public void setMinecraftVersion(String minecraftVersion) {
+        this.minecraftVersion = minecraftVersion;
+    }
+
+    @Override
+    public String getForgeVersion() {
+        return forgeVersion;
+    }
+
+    public void setForgeVersion(String forgeVersion) {
+        this.forgeVersion = forgeVersion;
     }
 }

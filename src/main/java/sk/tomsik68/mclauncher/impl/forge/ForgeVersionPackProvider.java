@@ -73,6 +73,8 @@ public class ForgeVersionPackProvider implements IForgeVersionPackProvider {
                 asset.setType(fileJson.get(1).toString());
                 asset.setHash(fileJson.get(2).toString());
                 asset.setDownloader(forgeDownloader);
+                asset.setMinecraftVersion(forgeVersion.getMinecraftVersion());
+                asset.setForgeVersion(forgeVersion.getForgeVersion());
             }
         }
 

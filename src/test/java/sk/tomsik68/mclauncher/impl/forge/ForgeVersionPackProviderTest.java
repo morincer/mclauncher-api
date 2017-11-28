@@ -1,11 +1,17 @@
 package sk.tomsik68.mclauncher.impl.forge;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import sk.tomsik68.mclauncher.api.forge.IForgeAsset;
+import sk.tomsik68.mclauncher.api.forge.IForgeDownloader;
 import sk.tomsik68.mclauncher.api.forge.IForgeVersion;
 import sk.tomsik68.mclauncher.api.forge.IForgeVersionPackInfo;
+import utils.DummyProgressMonitor;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Dictionary;
 
@@ -16,9 +22,15 @@ public class ForgeVersionPackProviderTest {
 
     private ForgeVersionPackProvider forgeVersionPackProvider;
 
+    private Path targetDir;
+
     @Before
     public void setUp() throws Exception {
         this.forgeVersionPackProvider = new ForgeVersionPackProvider();
+        this.targetDir = Paths.get("testmc/");
+        if (Files.exists(targetDir)) {
+            FileUtils.deleteDirectory(targetDir.toFile());
+        }
     }
 
     @Test
@@ -52,6 +64,12 @@ public class ForgeVersionPackProviderTest {
 
         assertThat(jarInstallerAsset, notNullValue());
         assertThat(jarInstallerAsset.getHash(), notNullValue());
-        assertThat(jarInstallerAsset.getDownloader(), notNullValue());
+
+        IForgeDownloader downloader = jarInstallerAsset.getDownloader();
+        assertThat(downloader, notNullValue());
+
+        Path download = downloader.download(jarInstallerAsset, targetDir, new DummyProgressMonitor());
+        assertTrue(Files.exists(download));
+
     }
 }
