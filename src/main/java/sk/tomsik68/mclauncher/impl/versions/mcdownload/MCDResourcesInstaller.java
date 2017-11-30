@@ -68,7 +68,7 @@ final class MCDResourcesInstaller {
                 MCLauncherAPI.log.trace("Downloading ".concat(asset.getKey()));
                 FileUtils.downloadFileWithProgress(asset.getUrl(), dest, progress);
             } else {
-                MCLauncherAPI.log.trace("No need to update ".concat(asset.getKey()));
+                MCLauncherAPI.log.debug("No need to update ".concat(asset.getKey()));
             }
         }
     }
