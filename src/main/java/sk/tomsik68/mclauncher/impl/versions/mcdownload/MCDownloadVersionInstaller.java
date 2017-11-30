@@ -14,6 +14,7 @@ import sk.tomsik68.mclauncher.util.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 //import java.util.logging.Logger;
@@ -135,9 +136,13 @@ final class MCDownloadVersionInstaller implements IVersionInstaller {
             if(haveProgress)
                 progress.setStatus("Downloading Game Jar...");
             try {
-                FileUtils.downloadFileWithProgress(JAR_DOWNLOAD_URL.replace("<VERSION>", version.getId()), jarDest, progress);
+                if (jarDest.exists()) {
+                    log.info("JAR-file already exists - skipping download");
+                } else {
+                    FileUtils.downloadFileWithProgress(JAR_DOWNLOAD_URL.replace("<VERSION>", version.getId()), jarDest, progress);
+                }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
         // notify listeners that installation is finished
