@@ -1,12 +1,18 @@
 package sk.tomsik68.mclauncher.impl.versions.mcdownload;
 
+import net.minidev.json.JSONValue;
 import org.junit.Before;
 import org.junit.Test;
 import sk.tomsik68.mclauncher.api.versions.IVersion;
 import sk.tomsik68.mclauncher.api.versions.IVersionShort;
 import sk.tomsik68.mclauncher.api.versions.LatestVersionInformation;
+import sk.tomsik68.mclauncher.util.FileUtils;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
@@ -48,10 +54,35 @@ public class MCDownloadCachedVersionListTest {
     }
 
     @Test
-    public void getVersionInfoShouldReturnNonEmptyBasicInformation() throws Exception {
+    public void retrieveVersionInfoShouldReturnVersionInformation() throws Exception {
         IVersion version = downloadCachedVersionList.retrieveVersionInfo("1.7.10");
         assertThat(version, notNullValue());
         assertThat(version.getId(), equalTo("1.7.10"));
+        assertThat(version.getLauncher(), notNullValue());
+    }
+
+    @Test
+    public void retrieveVersionInfoShouldReturnVersionIfItWasAlreadyDownloaded() throws Exception {
+        assertThat(downloadCachedVersionList.getVersionsCache(), nullValue());
+
+        // create a special hand-crafted version file
+        Path versionsDir = downloadCachedVersionList.getVersionsDirectory();
+        Path gromozekaVersionPath = Paths.get(versionsDir.toString(), "gromozeka", "gromozeka.json");
+        Files.deleteIfExists(gromozekaVersionPath);
+        Files.createDirectories(gromozekaVersionPath.getParent());
+        HashMap<String,String> values = new HashMap<>();
+        values.put("id", "gromozeka");
+        values.put("time", "0");
+        values.put("releaseTime", "0");
+        values.put("type", "0");
+
+        String s = JSONValue.toJSONString(values);
+        Files.write(gromozekaVersionPath, s.getBytes());
+
+        IVersion gromozekaVersion = downloadCachedVersionList.retrieveVersionInfo("gromozeka");
+        assertThat(downloadCachedVersionList.getVersionsCache(), nullValue());
+        assertThat(gromozekaVersion, notNullValue());
+        assertThat(gromozekaVersion.getId(), equalTo("gromozeka"));
     }
 
     @Test

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public interface ICachedVersionList extends IVersionList, IShortInfoVersionList {
-    public void setCacheDirectory(Path cacheDirectory);
-    public void invalidateCache() throws IOException;
+    Path getVersionsDirectory();
+    void setVersionsDirectory(Path cacheDirectory);
+    void invalidateCache() throws IOException;
 }

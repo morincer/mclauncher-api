@@ -6,7 +6,6 @@ import net.minidev.json.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sk.tomsik68.mclauncher.api.common.IObserver;
-import sk.tomsik68.mclauncher.api.common.MCLauncherAPI;
 import sk.tomsik68.mclauncher.api.versions.*;
 import sk.tomsik68.mclauncher.util.HttpUtils;
 
@@ -24,50 +23,58 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
     private final String manifestUrl;
 
     private static final Logger log = LoggerFactory.getLogger(MCDownloadCachedVersionList.class);
-
-    private Path versionsListFile;
+    private Path versionsDirectory;
 
     private Dictionary<String, IVersionShort> versionsCache;
 
-    public MCDownloadCachedVersionList(String cacheLocationDir) {
-        this(cacheLocationDir, VERSION_MANIFEST_URL);
+    public MCDownloadCachedVersionList(String versionsDir) {
+        this(versionsDir, VERSION_MANIFEST_URL);
     }
 
     /**
      * Creates a new instance allowing to specify both the cache directory and manifest URL
-     * @param cacheLocationDir - the directory to store the cached JSON
+     * @param versionDir - the directory to store the cached JSON
      * @param versionManifestUrl - the URL of the version_manifest.json
      */
-    public MCDownloadCachedVersionList(String cacheLocationDir, String versionManifestUrl) {
-        this.versionsListFile = Paths.get(cacheLocationDir, VERSIONS_LIST_FILENAME).toAbsolutePath();
+    public MCDownloadCachedVersionList(String versionDir, String versionManifestUrl) {
+        this.versionsDirectory = Paths.get(versionDir).toAbsolutePath();
         this.manifestUrl = versionManifestUrl;
     }
 
     @Override
     public void startDownload() throws Exception {
-        if (Files.exists(this.versionsListFile)) {
-            log.debug("Skipping download - file already exists at " + versionsListFile);
+        if (Files.exists(getVersionsListFile())) {
+            log.debug("Skipping download - file already exists at " + getVersionsListFile());
             return;
         }
 
         ensureVersionInfoManifest();
     }
 
+    public Dictionary<String, IVersionShort> getVersionsCache() {
+        return versionsCache;
+    }
+
     private void ensureVersionInfoManifest() throws Exception {
-        if (Files.exists(this.versionsListFile)) {
+        if (Files.exists(getVersionsListFile())) {
             return;
         } else {
-            Files.createDirectories(this.versionsListFile.getParent());
+            Files.createDirectories(this.getVersionsListFile().getParent());
             // at first, we download the complete version list
             log.info("Fetching versions metadata from " + manifestUrl);
             String jsonString = HttpUtils.httpGet(manifestUrl);
-            Files.write(this.versionsListFile, jsonString.getBytes());
+            Files.write(this.getVersionsListFile(), jsonString.getBytes());
         }
     }
 
     @Override
-    public void setCacheDirectory(Path cacheDirectory) {
-        this.versionsListFile = Paths.get(cacheDirectory.toAbsolutePath().toString(), VERSIONS_LIST_FILENAME);
+    public void setVersionsDirectory(Path versionDirectory) {
+        this.versionsDirectory = versionDirectory;
+    }
+
+    @Override
+    public Path getVersionsDirectory() {
+        return versionsDirectory;
     }
 
     /**
@@ -75,12 +82,20 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
      * @throws IOException
      */
     public void invalidateCache() throws IOException {
-        Files.deleteIfExists(this.versionsListFile);
+        Files.deleteIfExists(this.getVersionsListFile());
         versionsCache = null;
     }
 
     @Override
     public IVersion retrieveVersionInfo(String id) throws Exception {
+        // check if the version json already exists
+        Path versionJson = Paths.get(this.versionsDirectory.toString(), id, id + ".json");
+        if (Files.exists(versionJson)) {
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(Files.readAllBytes(versionJson));
+            MCDownloadVersion version = new MCDownloadVersion(jsonObject);
+            return version;
+        }
+
         ensureVersionsCache();
 
         IVersionShort mcDownloadVersion = versionsCache.get(id);
@@ -100,7 +115,7 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
             ensureVersionInfoManifest();
 
             versionsCache = new Hashtable<>();
-            JSONObject manifest = (JSONObject) JSONValue.parse(Files.readAllBytes(versionsListFile));
+            JSONObject manifest = (JSONObject) JSONValue.parse(Files.readAllBytes(getVersionsListFile()));
             JSONArray versions = (JSONArray) manifest.get("versions");
             for (Object object : versions) {
                 JSONObject versionInfo = (JSONObject) object;
@@ -114,7 +129,7 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
     @Override
     public LatestVersionInformation getLatestVersionInformation() throws Exception {
         ensureVersionInfoManifest();
-        JSONObject manifest = (JSONObject) JSONValue.parse(Files.readAllBytes(this.versionsListFile));
+        JSONObject manifest = (JSONObject) JSONValue.parse(Files.readAllBytes(getVersionsListFile()));
         JSONObject latest = (JSONObject) manifest.get("latest");
         LatestVersionInformation result = new LatestVersionInformation(latest.get("release").toString(), latest.get("snapshot").toString());
         return result;
@@ -136,7 +151,7 @@ public class MCDownloadCachedVersionList implements ICachedVersionList, IShortIn
     }
 
     public Path getVersionsListFile() {
-        return versionsListFile;
+        return Paths.get(this.versionsDirectory.toString(), "versions.json");
     }
 
     @Override
